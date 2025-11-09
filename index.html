@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Know Law - Your Smart Legal Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <svg width="70" height="85" viewBox="0 0 70 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Gold gradient for scale and brain -->
+                    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#D4AF37;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
+                    </linearGradient>
+                    <!-- Shield gradient -->
+                    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2a4a6c;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#1a3a5c;stop-opacity:1" />
+                    </linearGradient>
+                    <!-- Glow filter -->
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <!-- Scale of Justice - More prominent -->
+                <g id="scale" filter="url(#glow)">
+                    <!-- Scale base/stand with shadow -->
+                    <path d="M35 8 L35 20" stroke="#B8941F" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+                    <path d="M35 8 L35 20" stroke="url(#goldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                    
+                    <!-- Crossbar -->
+                    <path d="M18 20 L52 20" stroke="url(#goldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                    
+                    <!-- Left pan with depth -->
+                    <ellipse cx="22" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                    <ellipse cx="22" cy="22.5" rx="10" ry="3" fill="url(#goldGradient)"/>
+                    <path d="M12 22.5 L22 22.5" stroke="url(#goldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                    <ellipse cx="22" cy="22" rx="9" ry="2.5" fill="#FFD700" opacity="0.4"/>
+                    
+                    <!-- Right pan with depth -->
+                    <ellipse cx="48" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                    <ellipse cx="48" cy="22.5" rx="10" ry="3" fill="url(#goldGradient)"/>
+                    <path d="M48 22.5 L58 22.5" stroke="url(#goldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                    <ellipse cx="48" cy="22" rx="9" ry="2.5" fill="#FFD700" opacity="0.4"/>
+                    
+                    <!-- AI Text - Larger and clearer -->
+                    <text x="35" y="20" font-family="Arial, sans-serif" font-size="9" font-weight="900" fill="#FFD700" text-anchor="middle" stroke="#B8941F" stroke-width="0.3">AI</text>
+                </g>
+                
+                <!-- Shield with better definition -->
+                <path id="shield" d="M12 28 Q12 26 16 26 L54 26 Q58 26 58 28 L58 50 Q58 58 48 63 Q35 65 35 65 Q35 65 22 63 Q12 58 12 50 Z" 
+                      fill="url(#shieldGradient)" 
+                      stroke="#0f2a42" 
+                      stroke-width="1.5"/>
+                <!-- Shield highlight -->
+                <path d="M18 28 Q18 27 20 27 L50 27 Q52 27 52 28 L52 48 Q52 54 46 57 Q35 59 35 59 Q35 59 24 57 Q18 54 18 48 Z" 
+                      fill="url(#shieldGradient)" 
+                      opacity="0.5"/>
+                
+                <!-- Circuit patterns - More visible -->
+                <g id="circuits" opacity="0.8">
+                    <!-- Circuit nodes -->
+                    <circle cx="22" cy="35" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="48" cy="35" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="26" cy="40" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="44" cy="40" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="30" cy="45" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="40" cy="45" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="28" cy="50" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="42" cy="50" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    <circle cx="35" cy="52" r="2" fill="#66B2FF" filter="url(#glow)"/>
+                    
+                    <!-- Circuit connections -->
+                    <path d="M22 35 L26 40 M48 35 L44 40 M26 40 L30 45 M44 40 L40 45 M30 45 L28 50 M40 45 L42 50 M28 50 L35 52 M42 50 L35 52" 
+                          stroke="#66B2FF" 
+                          stroke-width="1.2" 
+                          stroke-linecap="round"
+                          opacity="0.9"/>
+                    <path d="M20 37 L24 37 M46 37 L50 37 M24 42 L46 42 M27 47 L43 47" 
+                          stroke="#66B2FF" 
+                          stroke-width="0.8" 
+                          stroke-linecap="round"
+                          opacity="0.7"/>
+                </g>
+                
+                <!-- Brain icon - More detailed and clearer -->
+                <g id="brain" filter="url(#glow)">
+                    <!-- Brain shadow -->
+                    <path d="M26 36 Q24 34 25 32 Q26 30 28 31 Q29 32 35 32 Q37 32 38 31 Q40 30 41 32 Q42 34 40 36 Q39 38 37 39 Q35 40 35 41 Q35 42 33 42 Q31 42 30 41 Q30 40 30 39 Q28 38 26 36 Z" 
+                          fill="#B8941F" 
+                          opacity="0.3"/>
+                    <!-- Brain main shape -->
+                    <path d="M26 35 Q24 33 25 31 Q26 29 28 30 Q29 31 35 31 Q37 31 38 30 Q40 29 41 31 Q42 33 40 35 Q39 37 37 38 Q35 39 35 40 Q35 41 33 41 Q31 41 30 40 Q30 39 30 38 Q28 37 26 35 Z" 
+                          fill="url(#goldGradient)"/>
+                    <!-- Brain detailed folds -->
+                    <path d="M28 32 Q29 33 30 32" stroke="#B8941F" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <path d="M35 32 Q36 33 37 32" stroke="#B8941F" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <path d="M27 34.5 Q29 35.5 31 34.5" stroke="#B8941F" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <path d="M34 34.5 Q36 35.5 38 34.5" stroke="#B8941F" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <path d="M28 37 Q30 38 32 37" stroke="#B8941F" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <path d="M33 37 Q35 38 37 37" stroke="#B8941F" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <path d="M29.5 39 Q31.5 39.5 32.5 39" stroke="#B8941F" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <!-- Brain highlight -->
+                    <ellipse cx="32" cy="34" rx="2" ry="1.5" fill="#FFD700" opacity="0.3"/>
+                </g>
+            </svg>
+            <div class="logo-text">
+                <span class="logo-title">Know Law</span>
+            </div>
+        </div>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <nav class="nav-bar" id="navBar">
+            <a href="#" class="nav-link active">HOME</a>
+            <a href="#" class="nav-link">ABOUT</a>
+            <a href="#" class="nav-link">PRODUCTS</a>
+            <a href="#" class="nav-link">SOCIALS</a>
+        </nav>
+        <button class="btn-header">DOWNLOAD App</button>
+    </header>
+
+    <main class="main-content">
+        <canvas id="background-canvas"></canvas>
+        <div class="content-wrapper">
+            <h1 class="headline">
+                <span>Know Law</span>
+            </h1>
+            <p class="subheadline">
+                Your Smart Legal Assistant Empowering People to Understand Their Rights Anytime, Anywhere
+            </p>
+            <div class="cta-buttons">
+                <button class="btn-primary">DOWNLOAD App</button>
+                <a href="auth.html" class="btn-secondary">GET STARTED</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

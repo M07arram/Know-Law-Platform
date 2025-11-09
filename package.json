@@ -1,0 +1,33 @@
+{
+  "name": "know-law-website",
+  "version": "1.0.0",
+  "description": "Know Law - Your Smart Legal Assistant",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "legal",
+    "assistant",
+    "chatbot",
+    "express",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "MIT"
+}

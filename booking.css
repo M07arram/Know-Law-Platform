@@ -1,0 +1,525 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: #0a0e1a;
+    color: white;
+    min-height: 100vh;
+}
+
+.booking-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+}
+
+/* Header */
+.booking-header {
+    background: rgba(10, 14, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(102, 178, 255, 0.2);
+    padding: 20px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(102, 178, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.back-button:hover {
+    background: rgba(102, 178, 255, 0.1);
+    border-color: #66B2FF;
+    transform: translateX(-3px);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo svg {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+.header-content h1 {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #66B2FF 0%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-left: auto;
+}
+
+.header-content p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-left: auto;
+}
+
+/* Main Content */
+.booking-main {
+    padding: 40px 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Search Section */
+.search-section {
+    margin-bottom: 40px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(10, 14, 26, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(102, 178, 255, 0.2);
+    border-radius: 15px;
+    padding: 15px 20px;
+    max-width: 600px;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    border-color: #66B2FF;
+    box-shadow: 0 0 20px rgba(102, 178, 255, 0.3);
+}
+
+.search-box svg {
+    color: rgba(255, 255, 255, 0.5);
+    flex-shrink: 0;
+}
+
+.search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 16px;
+    font-family: inherit;
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Lawyers Grid */
+.lawyers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.lawyer-card {
+    background: rgba(10, 14, 26, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(102, 178, 255, 0.2);
+    border-radius: 20px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.lawyer-card:hover {
+    transform: translateY(-5px);
+    border-color: #66B2FF;
+    box-shadow: 0 10px 30px rgba(102, 178, 255, 0.3);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.lawyer-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.lawyer-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #66B2FF 0%, #4a9eff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    border: 3px solid rgba(102, 178, 255, 0.3);
+}
+
+.lawyer-info h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.lawyer-info .lawyer-specialty {
+    font-size: 14px;
+    color: #66B2FF;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.lawyer-info .lawyer-experience {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.lawyer-description {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.lawyer-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(102, 178, 255, 0.1);
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.detail-item svg {
+    width: 16px;
+    height: 16px;
+    color: #66B2FF;
+}
+
+.lawyer-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.rating-stars svg {
+    width: 16px;
+    height: 16px;
+    color: #FFD700;
+    fill: #FFD700;
+}
+
+.rating-value {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+}
+
+.booking-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #66B2FF 0%, #4a9eff 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 178, 255, 0.3);
+}
+
+.booking-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 178, 255, 0.5);
+    background: linear-gradient(135deg, #4a9eff 0%, #66B2FF 100%);
+}
+
+.booking-btn:active {
+    transform: translateY(0);
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: rgba(10, 14, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(102, 178, 255, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.modal-content h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 25px;
+    padding-right: 40px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(102, 178, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #66B2FF;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 10px rgba(102, 178, 255, 0.2);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group select option {
+    background: #1a1f35;
+    color: white;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #66B2FF 0%, #4a9eff 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 178, 255, 0.3);
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 178, 255, 0.5);
+    background: linear-gradient(135deg, #4a9eff 0%, #66B2FF 100%);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Success Modal */
+.success-modal {
+    text-align: center;
+}
+
+.success-icon {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.success-modal h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    padding-right: 0;
+}
+
+.success-modal p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .booking-header {
+        padding: 15px 20px;
+    }
+
+    .header-content h1 {
+        font-size: 24px;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .header-content p {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
+    .booking-main {
+        padding: 20px 15px;
+    }
+
+    .lawyers-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .modal-content {
+        padding: 20px;
+        max-height: 85vh;
+    }
+}
+
+/* Hidden class for search filtering */
+.hidden {
+    display: none !important;
+}
+
+
+
+

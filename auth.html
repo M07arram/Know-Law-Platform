@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Sign In / Sign Up - Know Law</title>
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-background">
+            <canvas id="background-canvas"></canvas>
+        </div>
+        
+        <div class="auth-wrapper">
+            <div class="auth-card" id="authCard">
+                <!-- Sign In Form -->
+                <div class="auth-form sign-in-form active" id="signInForm">
+                    <div class="form-header">
+                        <h1>Welcome Back</h1>
+                        <p>Sign in to your Know Law account</p>
+                    </div>
+                    <form class="form-content" id="signInFormElement">
+                        <div class="form-group">
+                            <label for="signInEmail">Email</label>
+                            <input type="email" id="signInEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signInPassword">Password</label>
+                            <input type="password" id="signInPassword" placeholder="Enter your password" required>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox">
+                                <span>Remember me</span>
+                            </label>
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn-submit">Sign In</button>
+                        <button type="button" class="btn-skip" id="skipButton">Skip</button>
+                    </form>
+                    <div class="form-footer">
+                        <p>Don't have an account? <a href="#" class="switch-form" data-form="signup">Sign Up</a></p>
+                    </div>
+                </div>
+
+                <!-- Sign Up Form -->
+                <div class="auth-form sign-up-form" id="signUpForm">
+                    <div class="form-header">
+                        <h1>Create Account</h1>
+                        <p>Join Know Law and start your legal journey</p>
+                    </div>
+                    <form class="form-content" id="signUpFormElement">
+                        <div class="form-group">
+                            <label for="signUpName">Full Name</label>
+                            <input type="text" id="signUpName" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpEmail">Email</label>
+                            <input type="email" id="signUpEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpPassword">Password</label>
+                            <input type="password" id="signUpPassword" placeholder="Create a password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpConfirmPassword">Confirm Password</label>
+                            <input type="password" id="signUpConfirmPassword" placeholder="Confirm your password" required>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" required>
+                                <span>I agree to the <a href="#">Terms & Conditions</a></span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-submit">Sign Up</button>
+                    </form>
+                    <div class="form-footer">
+                        <p>Already have an account? <a href="#" class="switch-form" data-form="signin">Sign In</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <a href="index.html" class="back-home">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
+

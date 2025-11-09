@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Book a Lawyer - Know Law</title>
+    <link rel="stylesheet" href="booking.css">
+</head>
+<body>
+    <div class="booking-container">
+        <!-- Header -->
+        <header class="booking-header">
+            <a href="dashboard.html" class="back-button">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="50" height="60" viewBox="0 0 70 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="bookingGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#D4AF37;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="bookingShieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#2a4a6c;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#1a3a5c;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="bookingGlow">
+                                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <g id="booking-scale" filter="url(#bookingGlow)">
+                            <path d="M35 8 L35 20" stroke="#B8941F" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+                            <path d="M35 8 L35 20" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M18 20 L52 20" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                            <ellipse cx="22" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                            <ellipse cx="22" cy="22.5" rx="10" ry="3" fill="url(#bookingGoldGradient)"/>
+                            <path d="M12 22.5 L22 22.5" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                            <ellipse cx="48" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                            <ellipse cx="48" cy="22.5" rx="10" ry="3" fill="url(#bookingGoldGradient)"/>
+                            <path d="M48 22.5 L58 22.5" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                            <text x="35" y="20" font-family="Arial, sans-serif" font-size="9" font-weight="900" fill="#FFD700" text-anchor="middle">AI</text>
+                        </g>
+                        <path id="booking-shield" d="M12 28 Q12 26 16 26 L54 26 Q58 26 58 28 L58 50 Q58 58 48 63 Q35 65 35 65 Q35 65 22 63 Q12 58 12 50 Z" 
+                              fill="url(#bookingShieldGradient)" stroke="#0f2a42" stroke-width="1.5"/>
+                        <g id="booking-circuits" opacity="0.8">
+                            <circle cx="22" cy="35" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="48" cy="35" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="26" cy="40" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="44" cy="40" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="30" cy="45" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="40" cy="45" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="28" cy="50" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="42" cy="50" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <circle cx="35" cy="52" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                            <path d="M22 35 L26 40 M48 35 L44 40 M26 40 L30 45 M44 40 L40 45 M30 45 L28 50 M40 45 L42 50 M28 50 L35 52 M42 50 L35 52" 
+                                  stroke="#66B2FF" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+                        </g>
+                        <g id="booking-brain" filter="url(#bookingGlow)">
+                            <path d="M26 35 Q24 33 25 31 Q26 29 28 30 Q29 31 35 31 Q37 31 38 30 Q40 29 41 31 Q42 33 40 35 Q39 37 37 38 Q35 39 35 40 Q35 41 33 41 Q31 41 30 40 Q30 39 30 38 Q28 37 26 35 Z" 
+                                  fill="url(#bookingGoldGradient)"/>
+                        </g>
+                    </svg>
+                    <span class="logo-text">Know Law</span>
+                </div>
+                <h1>Book a Lawyer</h1>
+                <p>Find and book the right legal expert for your needs</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="booking-main">
+            <div class="search-section">
+                <div class="search-box">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19 19L14.65 14.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search for a lawyer or specialty...">
+                </div>
+            </div>
+
+            <div class="lawyers-grid" id="lawyersGrid">
+                <!-- Lawyer cards will be generated by JavaScript -->
+            </div>
+        </main>
+
+        <!-- Booking Modal -->
+        <div class="modal-overlay" id="bookingModal">
+            <div class="modal-content">
+                <button class="modal-close" id="closeModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <h2 id="modalTitle">Book Appointment</h2>
+                <form id="bookingForm">
+                    <input type="hidden" id="lawyerId" name="lawyerId">
+                    <div class="form-group">
+                        <label for="clientName">Your Name</label>
+                        <input type="text" id="clientName" name="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail">Email</label>
+                        <input type="email" id="clientEmail" name="clientEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone">Phone Number</label>
+                        <input type="tel" id="clientPhone" name="clientPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentDate">Preferred Date</label>
+                        <input type="date" id="appointmentDate" name="appointmentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentTime">Preferred Time</label>
+                        <select id="appointmentTime" name="appointmentTime" required>
+                            <option value="">Select time</option>
+                            <option value="09:00">9:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                            <option value="17:00">5:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="caseDescription">Case Description</label>
+                        <textarea id="caseDescription" name="caseDescription" rows="4" placeholder="Briefly describe your legal issue..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Book Appointment</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div class="modal-overlay" id="successModal">
+            <div class="modal-content success-modal">
+                <div class="success-icon">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                        <circle cx="30" cy="30" r="30" fill="rgba(102, 178, 255, 0.1)"/>
+                        <path d="M30 15C21.7157 15 15 21.7157 15 30C15 38.2843 21.7157 45 30 45C38.2843 45 45 38.2843 45 30C45 21.7157 38.2843 15 30 15Z" stroke="#66B2FF" stroke-width="2"/>
+                        <path d="M25 30L28 33L35 26" stroke="#66B2FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h2>Booking Successful!</h2>
+                <p>Your appointment request has been submitted. The lawyer will contact you soon.</p>
+                <button class="submit-btn" id="closeSuccessModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="booking.js"></script>
+</body>
+</html>
+
+
+
+
