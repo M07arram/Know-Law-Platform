@@ -17,6 +17,89 @@ body {
     background-color: #0a0e1a;
     color: white;
     position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.light-mode {
+    background-color: #f5f7fa;
+}
+
+/* Light Mode Styles */
+body.light-mode {
+    background-color: #f5f7fa;
+    color: #1a1a1a;
+}
+
+body.light-mode .auth-card {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .form-header h1 {
+    background: linear-gradient(135deg, #66B2FF 0%, #1a1a1a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.light-mode .form-header p {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .form-group label {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+body.light-mode .form-group input {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #1a1a1a;
+}
+
+body.light-mode .form-group input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.light-mode .form-group input:focus {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: #66B2FF;
+    box-shadow: 0 0 0 3px rgba(102, 178, 255, 0.1);
+}
+
+body.light-mode .checkbox-label {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+body.light-mode .form-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .form-footer p {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .btn-skip {
+    color: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .btn-skip:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.4);
+    color: #1a1a1a;
+}
+
+body.light-mode .back-home {
+    color: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .back-home:hover {
+    color: #1a1a1a;
+    background: rgba(0, 0, 0, 0.1);
+    border-color: #66B2FF;
 }
 
 .auth-container {

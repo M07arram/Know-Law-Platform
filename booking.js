@@ -1,5 +1,26 @@
+// Theme Management
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-mode');
+        document.body.classList.add('light-mode');
+    } else {
+        document.documentElement.classList.remove('light-mode');
+        document.body.classList.remove('light-mode');
+    }
+}
+
+// Initialize theme on page load
+initTheme();
+
+// Listen for theme changes from other pages
+window.addEventListener('storage', (e) => {
+    if (e.key === 'theme') {
+        initTheme();
+    }
+});
+
 // Booking functionality
-const lawyersGrid = document.getElementById('lawyersGrid');
 const searchInput = document.getElementById('searchInput');
 const bookingModal = document.getElementById('bookingModal');
 const successModal = document.getElementById('successModal');
@@ -144,27 +165,16 @@ const lawyers = [
     }
 ];
 
-// Render lawyers
-function renderLawyers(lawyersToRender = lawyers) {
-    lawyersGrid.innerHTML = '';
-    
-    if (lawyersToRender.length === 0) {
-        lawyersGrid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
-                <p>No lawyers found matching your search.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    lawyersToRender.forEach(lawyer => {
-        const card = document.createElement('div');
-        card.className = 'lawyer-card';
-        card.dataset.lawyerId = lawyer.id;
-        
-        const stars = '★'.repeat(Math.floor(lawyer.rating)) + '☆'.repeat(5 - Math.floor(lawyer.rating));
-        
-        card.innerHTML = `
+// Get unique categories from lawyers
+function getCategories() {
+    const categories = [...new Set(lawyers.map(l => l.specialty))];
+    return categories.sort();
+}
+
+// Create lawyer card HTML
+function createLawyerCard(lawyer) {
+    return `
+        <div class="lawyer-card" data-lawyer-id="${lawyer.id}" data-specialty="${lawyer.specialty}">
             <div class="lawyer-header">
                 <div class="lawyer-avatar">${lawyer.icon}</div>
                 <div class="lawyer-info">
@@ -201,9 +211,58 @@ function renderLawyers(lawyersToRender = lawyers) {
                 </div>
             </div>
             <button class="booking-btn" data-lawyer-id="${lawyer.id}">Book Appointment</button>
+        </div>
+    `;
+}
+
+// Render lawyers by category
+function renderLawyersByCategory(lawyersToRender = lawyers, selectedCategory = 'all') {
+    const container = document.getElementById('lawyersContainer');
+    container.innerHTML = '';
+    
+    if (lawyersToRender.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
+                <p>No lawyers found matching your search.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Group lawyers by specialty
+    const lawyersByCategory = {};
+    lawyersToRender.forEach(lawyer => {
+        if (!lawyersByCategory[lawyer.specialty]) {
+            lawyersByCategory[lawyer.specialty] = [];
+        }
+        lawyersByCategory[lawyer.specialty].push(lawyer);
+    });
+    
+    // Render each category section
+    Object.keys(lawyersByCategory).sort().forEach(specialty => {
+        // Skip if filtering by specific category and this isn't it
+        if (selectedCategory !== 'all' && selectedCategory !== specialty) {
+            return;
+        }
+        
+        const categoryId = specialty.toLowerCase().replace(/\s+/g, '-');
+        const section = document.createElement('section');
+        section.className = 'category-section';
+        section.id = `category-${categoryId}`;
+        section.dataset.category = specialty;
+        
+        section.innerHTML = `
+            <h2 class="category-title">
+                <span class="category-icon">${lawyersByCategory[specialty][0].icon}</span>
+                ${specialty}
+                <span class="lawyer-count">(${lawyersByCategory[specialty].length})</span>
+            </h2>
+            <div class="lawyers-grid">
+                ${lawyersByCategory[specialty].map(lawyer => createLawyerCard(lawyer)).join('')}
+            </div>
         `;
         
-        lawyersGrid.appendChild(card);
+        container.appendChild(section);
     });
     
     // Add event listeners to booking buttons
@@ -214,25 +273,67 @@ function renderLawyers(lawyersToRender = lawyers) {
             openBookingModal(lawyerId);
         });
     });
+    
+    // Scroll to category if filtered
+    if (selectedCategory !== 'all') {
+        const categoryId = selectedCategory.toLowerCase().replace(/\s+/g, '-');
+        const categorySection = document.getElementById(`category-${categoryId}`);
+        if (categorySection) {
+            setTimeout(() => {
+                categorySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }
+}
+
+// Current selected category
+let currentCategory = 'all';
+
+// Initialize category filter functionality
+function initCategoryFilters() {
+    document.querySelectorAll('.category-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active state
+            document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Get selected category
+            currentCategory = btn.dataset.category;
+            
+            // Filter and render
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let filteredLawyers = lawyers;
+            
+            if (searchTerm !== '') {
+                filteredLawyers = lawyers.filter(lawyer => 
+                    lawyer.name.toLowerCase().includes(searchTerm) ||
+                    lawyer.specialty.toLowerCase().includes(searchTerm) ||
+                    lawyer.description.toLowerCase().includes(searchTerm) ||
+                    lawyer.location.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderLawyersByCategory(filteredLawyers, currentCategory);
+        });
+    });
 }
 
 // Search functionality
 searchInput.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase().trim();
     
-    if (searchTerm === '') {
-        renderLawyers(lawyers);
-        return;
+    let filteredLawyers = lawyers;
+    
+    if (searchTerm !== '') {
+        filteredLawyers = lawyers.filter(lawyer => 
+            lawyer.name.toLowerCase().includes(searchTerm) ||
+            lawyer.specialty.toLowerCase().includes(searchTerm) ||
+            lawyer.description.toLowerCase().includes(searchTerm) ||
+            lawyer.location.toLowerCase().includes(searchTerm)
+        );
     }
     
-    const filteredLawyers = lawyers.filter(lawyer => 
-        lawyer.name.toLowerCase().includes(searchTerm) ||
-        lawyer.specialty.toLowerCase().includes(searchTerm) ||
-        lawyer.description.toLowerCase().includes(searchTerm) ||
-        lawyer.location.toLowerCase().includes(searchTerm)
-    );
-    
-    renderLawyers(filteredLawyers);
+    renderLawyersByCategory(filteredLawyers, currentCategory);
 });
 
 // Open booking modal
@@ -378,7 +479,8 @@ async function checkAuth() {
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
-    renderLawyers();
+    initCategoryFilters();
+    renderLawyersByCategory(lawyers, 'all');
     await loadUserInfo();
 });
 

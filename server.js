@@ -8,9 +8,15 @@ const path = require('path');
 const http = require('http');
 const multer = require('multer');
 const fs = require('fs');
+const OpenAI = require('openai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || ''
+});
 
 // Middleware
 app.use(cors({
@@ -1051,6 +1057,19 @@ app.post('/api/chat', (req, res, next) => {
             })));
         }
 
+        // Get conversation history for context (before saving new message)
+        let conversationHistory = [];
+        if (currentConversationId) {
+            const previousMessages = await dbQuery(
+                'SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at ASC LIMIT 10',
+                [currentConversationId]
+            );
+            conversationHistory = previousMessages.map(msg => ({
+                role: msg.role === 'user' ? 'user' : 'assistant',
+                content: msg.content
+            }));
+        }
+
         // Save user message to database
         const userMessageContent = message + fileInfo;
         await dbRun(
@@ -1066,7 +1085,9 @@ app.post('/api/chat', (req, res, next) => {
 
         // AI Legal Assistant Response Logic
         const userQuery = message + fileInfo;
-        const aiResponse = generateAIResponse(userQuery, files);
+        
+        // Generate AI response using ChatGPT API
+        const aiResponse = await generateAIResponse(userQuery, files, conversationHistory);
 
         // Save AI response to database
         await dbRun(
@@ -1093,8 +1114,7 @@ app.post('/api/chat', (req, res, next) => {
             });
         }
 
-        // Simulate AI thinking time (optional - remove for faster responses)
-        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+        // Remove simulated delay since API call already takes time
 
         res.json({
             success: true,
@@ -1110,77 +1130,305 @@ app.post('/api/chat', (req, res, next) => {
     }
 });
 
-// AI Response Generator (Legal Assistant)
-function generateAIResponse(userMessage, files = []) {
+// Language detection function
+function detectLanguage(text) {
+    // Check for Arabic characters (Unicode range: \u0600-\u06FF)
+    const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    return arabicPattern.test(text) ? 'ar' : 'en';
+}
+
+// AI Response Generator (Legal Assistant) - Bilingual Support with ChatGPT API
+async function generateAIResponse(userMessage, files = [], conversationHistory = []) {
+    const detectedLang = detectLanguage(userMessage);
+    
+    // Check if OpenAI API key is configured
+    const apiKey = process.env.OPENAI_API_KEY || '';
+    if (!apiKey || apiKey.trim() === '' || apiKey === 'your-api-key-here') {
+        console.warn('⚠️ OpenAI API key not configured. Using fallback responses.');
+        console.warn('💡 To enable ChatGPT, set OPENAI_API_KEY environment variable.');
+        return generateFallbackResponse(userMessage, files, detectedLang);
+    }
+    
+    try {
+        // Build system prompt focused on Egyptian law
+        const systemPrompt = `You are an expert AI legal assistant specialized in Egyptian law and the Egyptian Constitution of 2014. Your expertise includes:
+
+EGYPTIAN LEGAL SYSTEM:
+- Egyptian Constitution 2014 (supreme law of Egypt)
+- Egyptian Civil Code (Law 131/1948) - contracts, property, torts, obligations
+- Egyptian Criminal Code (Law 58/1937) - felonies (جنايات), misdemeanors (جنح), violations (مخالفات)
+- Egyptian Rent Law - Law No. 4 of 1996 (Old Rent) and Law No. 199 of 2021 (New Rent)
+- Egyptian Commercial Code
+- Egyptian Labor Law
+- Egyptian Personal Status Law
+- Egyptian court system: Constitutional Court, Court of Cassation, Courts of Appeal, Primary Courts
+
+IMPORTANT GUIDELINES:
+- Always respond in the SAME LANGUAGE as the user's question (English or Arabic)
+- Focus exclusively on Egyptian law and legal system
+- Provide accurate, detailed, and comprehensive information about Egyptian legal matters
+- Answer questions directly and helpfully - do not give generic responses asking for more specificity
+- Provide detailed explanations with examples when relevant
+- Always emphasize that specific legal advice should come from a licensed Egyptian attorney registered with the Egyptian Bar Association (نقابة المحامين)
+- Be helpful, professional, and clear in your explanations
+- Reference specific Egyptian laws, articles, and legal procedures when relevant
+- If asked about non-Egyptian law, politely redirect to Egyptian law context
+- If the question is unclear, make reasonable assumptions and provide helpful information based on common interpretations`;
+
+        // Limit conversation history to last 6 messages to avoid token limits
+        const recentHistory = conversationHistory.slice(-6);
+        
+        // Build messages array
+        const messages = [
+            { role: 'system', content: systemPrompt },
+            ...recentHistory,
+            { role: 'user', content: userMessage }
+        ];
+
+        // Add file information if files are uploaded
+        if (files.length > 0) {
+            const fileNames = files.map(f => f.originalname).join(', ');
+            const fileInfo = detectedLang === 'ar'
+                ? `\n\nملاحظة: المستخدم رفع ${files.length} ملف(ات): ${fileNames}. لا يمكنني قراءة محتوى الملفات، لكن يمكنني الإجابة على الأسئلة العامة حول المستندات القانونية المصرية.`
+                : `\n\nNote: User uploaded ${files.length} file(s): ${fileNames}. I cannot read file contents, but I can answer general questions about Egyptian legal documents.`;
+            messages[messages.length - 1].content += fileInfo;
+        }
+
+        console.log('🤖 Calling ChatGPT API...');
+        
+        // Call OpenAI API
+        const completion = await openai.chat.completions.create({
+            model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 2000,
+            presence_penalty: 0.6,
+            frequency_penalty: 0.3
+        });
+
+        const aiResponse = completion.choices[0].message.content.trim();
+        
+        if (!aiResponse || aiResponse.length === 0) {
+            throw new Error('Empty response from OpenAI API');
+        }
+
+        console.log('✅ ChatGPT API response received');
+        return aiResponse;
+        
+    } catch (error) {
+        console.error('❌ OpenAI API error:', error.message || error);
+        console.error('Error details:', error);
+        
+        // Provide more helpful error message
+        if (error.status === 401) {
+            console.error('🔑 Invalid API key. Please check your OPENAI_API_KEY.');
+        } else if (error.status === 429) {
+            console.error('⏱️ Rate limit exceeded. Please wait a moment.');
+        } else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+            console.error('🌐 Network error. Check your internet connection.');
+        }
+        
+        // Fallback to rule-based responses if API fails
+        console.warn('⚠️ Falling back to rule-based responses');
+        return generateFallbackResponse(userMessage, files, detectedLang);
+    }
+}
+
+// Fallback response generator (used when API is not available or fails)
+function generateFallbackResponse(userMessage, files = [], detectedLang = 'en') {
     const message = userMessage.toLowerCase().trim();
     
     // Handle file uploads
     if (files.length > 0) {
         const fileNames = files.map(f => f.originalname).join(', ');
+        
+        if (detectedLang === 'ar') {
+            return `شكراً لك على رفع ${files.length} ملف(ات): ${fileNames}. لقد استلمت مستنداتك.
+
+يمكنني مساعدتك في فهم المستندات القانونية المصرية وفقاً للدستور المصري والقوانين المصرية. أنصحك بمراجعة المستندات مع محامٍ مؤهل للحصول على نصيحة قانونية محددة.
+
+هل يمكنك إخباري ما هو السؤال القانوني المحدد الذي لديك حول هذه المستندات؟ على سبيل المثال:
+- هل تحتاج مساعدة في فهم عقد وفق القانون المدني المصري؟
+- هل تبحث عن توضيح للمصطلحات القانونية المصرية؟
+- هل تحتاج مساعدة في تحديد المشاكل القانونية المحتملة؟
+
+يرجى وصف ما تريد مني مساعدتك به فيما يتعلق بهذه الملفات.`;
+        } else {
         return `Thank you for uploading ${files.length} file(s): ${fileNames}. I've received your documents. 
 
-While I can provide general legal information, I recommend reviewing the documents with a qualified attorney for specific legal advice. 
+I can help you understand Egyptian legal documents according to the Egyptian Constitution and Egyptian laws. I recommend reviewing the documents with a qualified Egyptian attorney for specific legal advice. 
 
 Could you tell me what specific legal question you have about these documents? For example:
-- Do you need help understanding a contract?
-- Are you looking for clarification on legal terms?
+- Do you need help understanding a contract under Egyptian Civil Law?
+- Are you looking for clarification on Egyptian legal terms?
 - Do you need help identifying potential legal issues?
 
 Please describe what you'd like me to help you with regarding these files.`;
+        }
     }
     
-    // Legal knowledge base - responses to common legal questions
+    // Egyptian Legal knowledge base - responses to common legal questions (Bilingual)
+    // Focused on Egyptian Constitution and Egyptian Laws
     const responses = {
-        // Tenant rights
-        'tenant': 'As a tenant, you have several important rights including the right to habitable living conditions, privacy, protection from unlawful eviction, and the right to have your security deposit returned under certain conditions. Landlords must provide proper notice before entering your rental unit and cannot discriminate based on protected characteristics.',
+        // Egyptian Constitution
+        'constitution': {
+            en: 'The Egyptian Constitution of 2014 is the supreme law of Egypt. It establishes Egypt as a democratic republic, guarantees fundamental rights and freedoms, and defines the structure of government. Key provisions include: separation of powers, protection of human rights, freedom of expression, right to education, and social justice. The Constitution can only be amended by a two-thirds majority vote in Parliament and a public referendum.',
+            ar: 'دستور مصر 2014 هو القانون الأعلى في مصر. ينص على أن مصر جمهورية ديمقراطية، ويضمن الحقوق والحريات الأساسية، ويحدد هيكل الحكومة. الأحكام الرئيسية تشمل: فصل السلطات، وحماية حقوق الإنسان، وحرية التعبير، والحق في التعليم، والعدالة الاجتماعية. لا يمكن تعديل الدستور إلا بأغلبية ثلثي الأصوات في البرلمان واستفتاء عام.'
+        },
+        'دستور': {
+            en: 'The Egyptian Constitution of 2014 is the supreme law of Egypt. It establishes Egypt as a democratic republic, guarantees fundamental rights and freedoms, and defines the structure of government. Key provisions include: separation of powers, protection of human rights, freedom of expression, right to education, and social justice. The Constitution can only be amended by a two-thirds majority vote in Parliament and a public referendum.',
+            ar: 'دستور مصر 2014 هو القانون الأعلى في مصر. ينص على أن مصر جمهورية ديمقراطية، ويضمن الحقوق والحريات الأساسية، ويحدد هيكل الحكومة. الأحكام الرئيسية تشمل: فصل السلطات، وحماية حقوق الإنسان، وحرية التعبير، والحق في التعليم، والعدالة الاجتماعية. لا يمكن تعديل الدستور إلا بأغلبية ثلثي الأصوات في البرلمان واستفتاء عام.'
+        },
+        'مصر': {
+            en: 'Egypt operates under a civil law system based on the Egyptian Constitution of 2014. The legal system includes: Civil Code, Criminal Code, Commercial Code, Labor Law, Personal Status Law, and various specialized laws. Egyptian courts include: Constitutional Court, Court of Cassation, Courts of Appeal, Primary Courts, and specialized courts. All laws must comply with the Constitution.',
+            ar: 'تعمل مصر تحت نظام القانون المدني المستند إلى دستور مصر 2014. النظام القانوني يشمل: القانون المدني، والقانون الجنائي، والقانون التجاري، وقانون العمل، وقانون الأحوال الشخصية، وقوانين متخصصة أخرى. محاكم مصر تشمل: المحكمة الدستورية، ومحكمة النقض، ومحاكم الاستئناف، والمحاكم الابتدائية، والمحاكم المتخصصة. يجب أن تتوافق جميع القوانين مع الدستور.'
+        },
+        'egyptian': {
+            en: 'Egypt operates under a civil law system based on the Egyptian Constitution of 2014. The legal system includes: Civil Code, Criminal Code, Commercial Code, Labor Law, Personal Status Law, and various specialized laws. Egyptian courts include: Constitutional Court, Court of Cassation, Courts of Appeal, Primary Courts, and specialized courts. All laws must comply with the Constitution.',
+            ar: 'تعمل مصر تحت نظام القانون المدني المستند إلى دستور مصر 2014. النظام القانوني يشمل: القانون المدني، والقانون الجنائي، والقانون التجاري، وقانون العمل، وقانون الأحوال الشخصية، وقوانين متخصصة أخرى. محاكم مصر تشمل: المحكمة الدستورية، ومحكمة النقض، ومحاكم الاستئناف، والمحاكم الابتدائية، والمحاكم المتخصصة. يجب أن تتوافق جميع القوانين مع الدستور.'
+        },
+        // Egyptian Real Estate and Rent Law
+        'tenant': {
+            en: 'Under Egyptian Law No. 4 of 1996 (Old Rent Law) and Law No. 199 of 2021 (New Rent Law), tenants have rights including: protection from arbitrary eviction, right to habitable premises, and proper notice requirements. The Old Rent Law applies to contracts before 2001 with rent control. New contracts follow market rates. Eviction requires court order and valid reasons such as non-payment, breach of contract, or owner\'s need for personal use.',
+            ar: 'وفقاً لقانون الإيجار القديم رقم 4 لسنة 1996 وقانون الإيجار الجديد رقم 199 لسنة 2021، للمستأجرين حقوق تشمل: الحماية من الإخلاء التعسفي، والحق في مسكن صالح للسكن، ومتطلبات الإشعار المناسبة. قانون الإيجار القديم ينطبق على العقود قبل 2001 مع تحديد الإيجار. العقود الجديدة تتبع أسعار السوق. الإخلاء يتطلب أمر محكمة وأسباباً صحيحة مثل عدم الدفع، أو انتهاك العقد، أو حاجة المالك للاستخدام الشخصي.'
+        },
+        'rent': {
+            en: 'Egyptian rent law distinguishes between old rent (pre-2001) and new rent contracts. Old rent contracts are subject to rent control and can only be increased by specific percentages set by law. New rent contracts (Law 199/2021) follow market rates. Rent increases must be agreed upon in the contract or follow legal procedures. Disputes are resolved through Real Estate Rental Dispute Committees or courts.',
+            ar: 'قانون الإيجار المصري يميز بين الإيجار القديم (قبل 2001) وعقود الإيجار الجديدة. عقود الإيجار القديمة تخضع لتحديد الإيجار ويمكن زيادتها فقط بنسب محددة يحددها القانون. عقود الإيجار الجديدة (قانون 199/2021) تتبع أسعار السوق. زيادة الإيجار يجب أن يتم الاتفاق عليها في العقد أو اتباع الإجراءات القانونية. النزاعات تحل من خلال لجان منازعات إيجار العقارات أو المحاكم.'
+        },
+        'إيجار': {
+            en: 'Egyptian rent law distinguishes between old rent (pre-2001) and new rent contracts. Old rent contracts are subject to rent control and can only be increased by specific percentages set by law. New rent contracts (Law 199/2021) follow market rates. Rent increases must be agreed upon in the contract or follow legal procedures. Disputes are resolved through Real Estate Rental Dispute Committees or courts.',
+            ar: 'قانون الإيجار المصري يميز بين الإيجار القديم (قبل 2001) وعقود الإيجار الجديدة. عقود الإيجار القديمة تخضع لتحديد الإيجار ويمكن زيادتها فقط بنسب محددة يحددها القانون. عقود الإيجار الجديدة (قانون 199/2021) تتبع أسعار السوق. زيادة الإيجار يجب أن يتم الاتفاق عليها في العقد أو اتباع الإجراءات القانونية. النزاعات تحل من خلال لجان منازعات إيجار العقارات أو المحاكم.'
+        },
+        'مستأجر': {
+            en: 'Under Egyptian Law No. 4 of 1996 (Old Rent Law) and Law No. 199 of 2021 (New Rent Law), tenants have rights including: protection from arbitrary eviction, right to habitable premises, and proper notice requirements. The Old Rent Law applies to contracts before 2001 with rent control. New contracts follow market rates. Eviction requires court order and valid reasons such as non-payment, breach of contract, or owner\'s need for personal use.',
+            ar: 'وفقاً لقانون الإيجار القديم رقم 4 لسنة 1996 وقانون الإيجار الجديد رقم 199 لسنة 2021، للمستأجرين حقوق تشمل: الحماية من الإخلاء التعسفي، والحق في مسكن صالح للسكن، ومتطلبات الإشعار المناسبة. قانون الإيجار القديم ينطبق على العقود قبل 2001 مع تحديد الإيجار. العقود الجديدة تتبع أسعار السوق. الإخلاء يتطلب أمر محكمة وأسباباً صحيحة مثل عدم الدفع، أو انتهاك العقد، أو حاجة المالك للاستخدام الشخصي.'
+        },
         
-        'rent': 'Your rights as a tenant regarding rent include the right to receive proper notice before rent increases, protection from retaliatory eviction if you report code violations, and the right to withhold rent in some jurisdictions if the landlord fails to make necessary repairs. Always check your local tenant laws as they vary by location.',
+        // Egyptian Court System and Procedures
+        'complaint': {
+            en: 'In Egypt, to file a legal complaint: 1) Determine the appropriate court (Primary Court for civil matters, Criminal Court for crimes), 2) Prepare a written complaint (da\'wa) with facts and evidence, 3) File at the court clerk\'s office with required documents, 4) Pay court fees (varies by case value), 5) Serve the complaint to defendant through court bailiff. Egyptian courts follow civil law procedures. Consider consulting an Egyptian lawyer as procedures can be complex.',
+            ar: 'في مصر، لتقديم شكوى قانونية: 1) تحديد المحكمة المناسبة (المحكمة الابتدائية للمسائل المدنية، محكمة الجنح/الجنايات للجرائم)، 2) إعداد دعوى مكتوبة بالحقائق والأدلة، 3) تقديمها في مكتب كاتب المحكمة مع المستندات المطلوبة، 4) دفع الرسوم القضائية (تختلف حسب قيمة القضية)، 5) إبلاغ المدعى عليه من خلال محضر المحكمة. محاكم مصر تتبع إجراءات القانون المدني. فكر في استشارة محامٍ مصري لأن الإجراءات قد تكون معقدة.'
+        },
+        'شكوى': {
+            en: 'In Egypt, to file a legal complaint: 1) Determine the appropriate court (Primary Court for civil matters, Criminal Court for crimes), 2) Prepare a written complaint (da\'wa) with facts and evidence, 3) File at the court clerk\'s office with required documents, 4) Pay court fees (varies by case value), 5) Serve the complaint to defendant through court bailiff. Egyptian courts follow civil law procedures. Consider consulting an Egyptian lawyer as procedures can be complex.',
+            ar: 'في مصر، لتقديم شكوى قانونية: 1) تحديد المحكمة المناسبة (المحكمة الابتدائية للمسائل المدنية، محكمة الجنح/الجنايات للجرائم)، 2) إعداد دعوى مكتوبة بالحقائق والأدلة، 3) تقديمها في مكتب كاتب المحكمة مع المستندات المطلوبة، 4) دفع الرسوم القضائية (تختلف حسب قيمة القضية)، 5) إبلاغ المدعى عليه من خلال محضر المحكمة. محاكم مصر تتبع إجراءات القانون المدني. فكر في استشارة محامٍ مصري لأن الإجراءات قد تكون معقدة.'
+        },
+        'sue': {
+            en: 'In Egyptian law, before filing a lawsuit (da\'wa), consider: 1) Whether you have a valid claim under Egyptian Civil Code, 2) Statute of limitations (usually 15 years for contracts, 3 years for torts), 3) Whether mediation or settlement is possible, 4) Court fees and lawyer costs, 5) Whether you have sufficient evidence. Cases start in Primary Courts, can be appealed to Courts of Appeal, and finally to Court of Cassation. Consult an Egyptian lawyer for specific advice.',
+            ar: 'في القانون المصري، قبل رفع دعوى قضائية، فكر في: 1) ما إذا كان لديك مطالبة صالحة وفق القانون المدني المصري، 2) قانون التقادم (عادة 15 سنة للعقود، 3 سنوات للمسؤولية التقصيرية)، 3) ما إذا كان الوساطة أو التسوية ممكنة، 4) الرسوم القضائية وتكاليف المحامي، 5) ما إذا كان لديك أدلة كافية. القضايا تبدأ في المحاكم الابتدائية، يمكن استئنافها في محاكم الاستئناف، وأخيراً في محكمة النقض. استشر محامياً مصرياً للحصول على نصيحة محددة.'
+        },
+        'دعوى': {
+            en: 'In Egyptian law, before filing a lawsuit (da\'wa), consider: 1) Whether you have a valid claim under Egyptian Civil Code, 2) Statute of limitations (usually 15 years for contracts, 3 years for torts), 3) Whether mediation or settlement is possible, 4) Court fees and lawyer costs, 5) Whether you have sufficient evidence. Cases start in Primary Courts, can be appealed to Courts of Appeal, and finally to Court of Cassation. Consult an Egyptian lawyer for specific advice.',
+            ar: 'في القانون المصري، قبل رفع دعوى قضائية، فكر في: 1) ما إذا كان لديك مطالبة صالحة وفق القانون المدني المصري، 2) قانون التقادم (عادة 15 سنة للعقود، 3 سنوات للمسؤولية التقصيرية)، 3) ما إذا كان الوساطة أو التسوية ممكنة، 4) الرسوم القضائية وتكاليف المحامي، 5) ما إذا كان لديك أدلة كافية. القضايا تبدأ في المحاكم الابتدائية، يمكن استئنافها في محاكم الاستئناف، وأخيراً في محكمة النقض. استشر محامياً مصرياً للحصول على نصيحة محددة.'
+        },
         
-        // Filing complaints
-        'complaint': 'To file a legal complaint, you typically need to: 1) Identify the appropriate court or agency, 2) Prepare a written complaint detailing the facts, 3) File the complaint with the court clerk, 4) Pay any required filing fees, and 5) Serve the complaint to the defendant. Consider consulting with an attorney for complex matters.',
+        // Egyptian Civil and Criminal Law
+        'civil': {
+            en: 'Egyptian Civil Code (Law 131/1948) governs private disputes between individuals/organizations. It covers contracts, property, torts, family law (for non-Muslims), and obligations. Civil cases are heard in Primary Courts, with appeals to Courts of Appeal and Court of Cassation. The Code is based on French civil law principles adapted to Egyptian context. Key areas: contract formation, breach of contract, property rights, and compensation for damages.',
+            ar: 'القانون المدني المصري (قانون 131/1948) يحكم النزاعات الخاصة بين الأفراد/المنظمات. يشمل العقود، والملكية، والمسؤولية التقصيرية، وقانون الأحوال الشخصية (لغير المسلمين)، والالتزامات. القضايا المدنية تُسمع في المحاكم الابتدائية، مع الاستئناف في محاكم الاستئناف ومحكمة النقض. القانون مبني على مبادئ القانون المدني الفرنسي المكيفة للسياق المصري. المجالات الرئيسية: تكوين العقود، وانتهاك العقود، وحقوق الملكية، والتعويض عن الأضرار.'
+        },
+        'مدني': {
+            en: 'Egyptian Civil Code (Law 131/1948) governs private disputes between individuals/organizations. It covers contracts, property, torts, family law (for non-Muslims), and obligations. Civil cases are heard in Primary Courts, with appeals to Courts of Appeal and Court of Cassation. The Code is based on French civil law principles adapted to Egyptian context. Key areas: contract formation, breach of contract, property rights, and compensation for damages.',
+            ar: 'القانون المدني المصري (قانون 131/1948) يحكم النزاعات الخاصة بين الأفراد/المنظمات. يشمل العقود، والملكية، والمسؤولية التقصيرية، وقانون الأحوال الشخصية (لغير المسلمين)، والالتزامات. القضايا المدنية تُسمع في المحاكم الابتدائية، مع الاستئناف في محاكم الاستئناف ومحكمة النقض. القانون مبني على مبادئ القانون المدني الفرنسي المكيفة للسياق المصري. المجالات الرئيسية: تكوين العقود، وانتهاك العقود، وحقوق الملكية، والتعويض عن الأضرار.'
+        },
+        'criminal': {
+            en: 'Egyptian Criminal Code (Law 58/1937) defines crimes and penalties. Crimes are classified as: felonies (جنايات) - serious crimes with severe penalties, misdemeanors (جنح) - less serious crimes, and violations (مخالفات) - minor offenses. The Public Prosecution (النيابة العامة) investigates and prosecutes crimes. Defendants have rights including: legal representation, presumption of innocence, and fair trial. Penalties range from fines to imprisonment to death penalty (for certain crimes).',
+            ar: 'القانون الجنائي المصري (قانون 58/1937) يحدد الجرائم والعقوبات. الجرائم تصنف كـ: جنايات - جرائم خطيرة بعقوبات شديدة، وجنح - جرائم أقل خطورة، ومخالفات - جرائم بسيطة. النيابة العامة تحقق وتقاضي الجرائم. للمتهمين حقوق تشمل: التمثيل القانوني، وافتراض البراءة، والمحاكمة العادلة. العقوبات تتراوح من الغرامات إلى السجن إلى عقوبة الإعدام (لجرائم معينة).'
+        },
+        'جنائي': {
+            en: 'Egyptian Criminal Code (Law 58/1937) defines crimes and penalties. Crimes are classified as: felonies (جنايات) - serious crimes with severe penalties, misdemeanors (جنح) - less serious crimes, and violations (مخالفات) - minor offenses. The Public Prosecution (النيابة العامة) investigates and prosecutes crimes. Defendants have rights including: legal representation, presumption of innocence, and fair trial. Penalties range from fines to imprisonment to death penalty (for certain crimes).',
+            ar: 'القانون الجنائي المصري (قانون 58/1937) يحدد الجرائم والعقوبات. الجرائم تصنف كـ: جنايات - جرائم خطيرة بعقوبات شديدة، وجنح - جرائم أقل خطورة، ومخالفات - جرائم بسيطة. النيابة العامة تحقق وتقاضي الجرائم. للمتهمين حقوق تشمل: التمثيل القانوني، وافتراض البراءة، والمحاكمة العادلة. العقوبات تتراوح من الغرامات إلى السجن إلى عقوبة الإعدام (لجرائم معينة).'
+        },
         
-        'sue': 'Before filing a lawsuit, consider: 1) Whether you have a valid legal claim, 2) The statute of limitations in your jurisdiction, 3) Whether mediation or negotiation could resolve the issue, 4) The costs involved, and 5) Whether you can prove your case. Small claims court may be an option for disputes under a certain dollar amount.',
+        // Egyptian Contract Law
+        'contract': {
+            en: 'Under Egyptian Civil Code (Articles 89-200), a valid contract requires: 1) Offer and acceptance (إيجاب وقبول), 2) Legal capacity of parties (age 21 or emancipation), 3) Subject matter (محل العقد) that is legal and possible, 4) Cause (السبب) - lawful purpose. Contracts can be written or oral, but certain contracts (real estate, employment over 3 months) must be written. Breach of contract entitles the injured party to damages or specific performance.',
+            ar: 'وفق القانون المدني المصري (المواد 89-200)، العقد الصالح يتطلب: 1) الإيجاب والقبول، 2) الأهلية القانونية للأطراف (21 سنة أو التحرر)، 3) محل العقد - قانوني وممكن، 4) السبب - غرض قانوني. العقود يمكن أن تكون مكتوبة أو شفهية، لكن عقود معينة (العقارات، العمل لأكثر من 3 أشهر) يجب أن تكون مكتوبة. انتهاك العقد يعطي الطرف المتضرر الحق في التعويض أو التنفيذ العيني.'
+        },
+        'عقد': {
+            en: 'Under Egyptian Civil Code (Articles 89-200), a valid contract requires: 1) Offer and acceptance (إيجاب وقبول), 2) Legal capacity of parties (age 21 or emancipation), 3) Subject matter (محل العقد) that is legal and possible, 4) Cause (السبب) - lawful purpose. Contracts can be written or oral, but certain contracts (real estate, employment over 3 months) must be written. Breach of contract entitles the injured party to damages or specific performance.',
+            ar: 'وفق القانون المدني المصري (المواد 89-200)، العقد الصالح يتطلب: 1) الإيجاب والقبول، 2) الأهلية القانونية للأطراف (21 سنة أو التحرر)، 3) محل العقد - قانوني وممكن، 4) السبب - غرض قانوني. العقود يمكن أن تكون مكتوبة أو شفهية، لكن عقود معينة (العقارات، العمل لأكثر من 3 أشهر) يجب أن تكون مكتوبة. انتهاك العقد يعطي الطرف المتضرر الحق في التعويض أو التنفيذ العيني.'
+        },
+        'agreement': {
+            en: 'In Egyptian law, agreements (اتفاقات) can be written or oral. However, certain agreements must be in writing: real estate transactions, employment contracts over 3 months, commercial agency agreements, and guarantees. Written agreements are strongly recommended as they provide better evidence. Key elements: clear terms, mutual consent, lawful purpose, and legal capacity. Always have important agreements reviewed by an Egyptian lawyer before signing.',
+            ar: 'في القانون المصري، الاتفاقات يمكن أن تكون مكتوبة أو شفهية. لكن اتفاقات معينة يجب أن تكون مكتوبة: معاملات العقارات، وعقود العمل لأكثر من 3 أشهر، واتفاقات الوكالة التجارية، والضمانات. الاتفاقات المكتوبة موصى بها بشدة لأنها توفر أدلة أفضل. العناصر الرئيسية: شروط واضحة، وموافقة متبادلة، وغرض قانوني، وأهلية قانونية. دائماً اجعل محامياً مصرياً يراجع الاتفاقات المهمة قبل التوقيع.'
+        },
+        'اتفاق': {
+            en: 'In Egyptian law, agreements (اتفاقات) can be written or oral. However, certain agreements must be in writing: real estate transactions, employment contracts over 3 months, commercial agency agreements, and guarantees. Written agreements are strongly recommended as they provide better evidence. Key elements: clear terms, mutual consent, lawful purpose, and legal capacity. Always have important agreements reviewed by an Egyptian lawyer before signing.',
+            ar: 'في القانون المصري، الاتفاقات يمكن أن تكون مكتوبة أو شفهية. لكن اتفاقات معينة يجب أن تكون مكتوبة: معاملات العقارات، وعقود العمل لأكثر من 3 أشهر، واتفاقات الوكالة التجارية، والضمانات. الاتفاقات المكتوبة موصى بها بشدة لأنها توفر أدلة أفضل. العناصر الرئيسية: شروط واضحة، وموافقة متبادلة، وغرض قانوني، وأهلية قانونية. دائماً اجعل محامياً مصرياً يراجع الاتفاقات المهمة قبل التوقيع.'
+        },
         
-        // Legal system basics
-        'civil': 'Civil law deals with disputes between individuals or organizations, typically involving compensation for harm. Examples include contract disputes, personal injury claims, and property disputes. Criminal law involves the government prosecuting individuals for actions that harm society, such as theft or assault.',
-        
-        'criminal': 'Criminal law involves actions that are considered harmful to society as a whole. The government (prosecutor) brings charges against individuals, and penalties can include fines, probation, or imprisonment. Defendants have the right to an attorney, the right to remain silent, and the right to a trial by jury.',
-        
-        // Contracts
-        'contract': 'A contract is a legally binding agreement between two or more parties. For a contract to be valid, it typically requires: 1) Offer and acceptance, 2) Consideration (something of value exchanged), 3) Legal capacity of parties, 4) Legality of purpose, and 5) Mutual assent. Written contracts are generally easier to enforce than verbal agreements.',
-        
-        'agreement': 'Legal agreements can be written or verbal, though written agreements are strongly recommended. Key elements include clear terms, mutual consent, and consideration. Always read contracts carefully before signing and consider having an attorney review important agreements.',
-        
-        // General legal advice
-        'rights': 'Your legal rights depend on your specific situation and jurisdiction. Common rights include the right to due process, freedom from discrimination, privacy rights, property rights, and contractual rights. For specific questions about your rights, it\'s best to consult with a qualified attorney in your area.',
-        
-        'lawyer': 'You may need a lawyer if you\'re: facing criminal charges, involved in a lawsuit, dealing with complex business transactions, going through a divorce, drafting important documents, or if your legal rights have been violated. Many attorneys offer free consultations to discuss your case.',
-        
-        'legal': 'Legal matters can be complex and vary by jurisdiction. While I can provide general information, specific legal advice should come from a licensed attorney familiar with your local laws and circumstances. For urgent legal matters, contact a legal aid organization or attorney immediately.',
+        // Egyptian Constitutional Rights
+        'rights': {
+            en: 'The Egyptian Constitution of 2014 guarantees fundamental rights including: equality before the law, freedom of belief and expression, right to education and healthcare, right to property, right to work, freedom of assembly and association, privacy rights, and right to fair trial. These rights are protected by the Constitutional Court. Violations can be challenged through constitutional petitions. For specific questions about your rights under Egyptian law, consult an Egyptian constitutional lawyer.',
+            ar: 'دستور مصر 2014 يضمن الحقوق الأساسية بما في ذلك: المساواة أمام القانون، وحرية الاعتقاد والتعبير، والحق في التعليم والرعاية الصحية، والحق في الملكية، والحق في العمل، وحرية التجمع والجمعيات، وحقوق الخصوصية، والحق في المحاكمة العادلة. هذه الحقوق محمية من قبل المحكمة الدستورية. الانتهاكات يمكن الطعن فيها من خلال الطعون الدستورية. للأسئلة المحددة حول حقوقك بموجب القانون المصري، استشر محامياً دستورياً مصرياً.'
+        },
+        'حقوق': {
+            en: 'The Egyptian Constitution of 2014 guarantees fundamental rights including: equality before the law, freedom of belief and expression, right to education and healthcare, right to property, right to work, freedom of assembly and association, privacy rights, and right to fair trial. These rights are protected by the Constitutional Court. Violations can be challenged through constitutional petitions. For specific questions about your rights under Egyptian law, consult an Egyptian constitutional lawyer.',
+            ar: 'دستور مصر 2014 يضمن الحقوق الأساسية بما في ذلك: المساواة أمام القانون، وحرية الاعتقاد والتعبير، والحق في التعليم والرعاية الصحية، والحق في الملكية، والحق في العمل، وحرية التجمع والجمعيات، وحقوق الخصوصية، والحق في المحاكمة العادلة. هذه الحقوق محمية من قبل المحكمة الدستورية. الانتهاكات يمكن الطعن فيها من خلال الطعون الدستورية. للأسئلة المحددة حول حقوقك بموجب القانون المصري، استشر محامياً دستورياً مصرياً.'
+        },
+        'lawyer': {
+            en: 'In Egypt, you may need a lawyer (محامي) for: criminal charges, civil lawsuits, commercial disputes, real estate transactions, family law matters (marriage, divorce, inheritance), labor disputes, administrative appeals, and drafting legal documents. Lawyers must be registered with the Egyptian Bar Association (نقابة المحامين). Many lawyers offer initial consultations. For urgent matters, contact the Bar Association or a legal aid organization.',
+            ar: 'في مصر، قد تحتاج محامياً (محامي) لـ: التهم الجنائية، والدعاوى المدنية، والنزاعات التجارية، ومعاملات العقارات، ومسائل قانون الأحوال الشخصية (الزواج، الطلاق، الميراث)، ونزاعات العمل، والطعون الإدارية، وإعداد الوثائق القانونية. المحامون يجب أن يكونوا مسجلين في نقابة المحامين المصرية. العديد من المحامين يقدمون استشارات أولية. للمسائل العاجلة، اتصل بنقابة المحامين أو منظمة المساعدة القانونية.'
+        },
+        'محامي': {
+            en: 'In Egypt, you may need a lawyer (محامي) for: criminal charges, civil lawsuits, commercial disputes, real estate transactions, family law matters (marriage, divorce, inheritance), labor disputes, administrative appeals, and drafting legal documents. Lawyers must be registered with the Egyptian Bar Association (نقابة المحامين). Many lawyers offer initial consultations. For urgent matters, contact the Bar Association or a legal aid organization.',
+            ar: 'في مصر، قد تحتاج محامياً (محامي) لـ: التهم الجنائية، والدعاوى المدنية، والنزاعات التجارية، ومعاملات العقارات، ومسائل قانون الأحوال الشخصية (الزواج، الطلاق، الميراث)، ونزاعات العمل، والطعون الإدارية، وإعداد الوثائق القانونية. المحامون يجب أن يكونوا مسجلين في نقابة المحامين المصرية. العديد من المحامين يقدمون استشارات أولية. للمسائل العاجلة، اتصل بنقابة المحامين أو منظمة المساعدة القانونية.'
+        },
+        'محام': {
+            en: 'In Egypt, you may need a lawyer (محامي) for: criminal charges, civil lawsuits, commercial disputes, real estate transactions, family law matters (marriage, divorce, inheritance), labor disputes, administrative appeals, and drafting legal documents. Lawyers must be registered with the Egyptian Bar Association (نقابة المحامين). Many lawyers offer initial consultations. For urgent matters, contact the Bar Association or a legal aid organization.',
+            ar: 'في مصر، قد تحتاج محامياً (محامي) لـ: التهم الجنائية، والدعاوى المدنية، والنزاعات التجارية، ومعاملات العقارات، ومسائل قانون الأحوال الشخصية (الزواج، الطلاق، الميراث)، ونزاعات العمل، والطعون الإدارية، وإعداد الوثائق القانونية. المحامون يجب أن يكونوا مسجلين في نقابة المحامين المصرية. العديد من المحامين يقدمون استشارات أولية. للمسائل العاجلة، اتصل بنقابة المحامين أو منظمة المساعدة القانونية.'
+        },
+        'legal': {
+            en: 'Egyptian legal matters are governed by the Constitution of 2014 and various codes: Civil Code, Criminal Code, Commercial Code, Labor Law, Personal Status Law, and specialized laws. The legal system follows civil law principles. While I can provide general information about Egyptian law, specific legal advice should come from a licensed Egyptian attorney registered with the Bar Association. For urgent matters, contact a lawyer or legal aid organization immediately.',
+            ar: 'المسائل القانونية المصرية يحكمها دستور 2014 وقوانين مختلفة: القانون المدني، والقانون الجنائي، والقانون التجاري، وقانون العمل، وقانون الأحوال الشخصية، وقوانين متخصصة. النظام القانوني يتبع مبادئ القانون المدني. بينما يمكنني تقديم معلومات عامة عن القانون المصري، يجب أن تأتي النصيحة القانونية المحددة من محامٍ مصري مرخص مسجل في نقابة المحامين. للمسائل العاجلة، اتصل بمحامٍ أو منظمة مساعدة قانونية فوراً.'
+        },
+        'قانوني': {
+            en: 'Egyptian legal matters are governed by the Constitution of 2014 and various codes: Civil Code, Criminal Code, Commercial Code, Labor Law, Personal Status Law, and specialized laws. The legal system follows civil law principles. While I can provide general information about Egyptian law, specific legal advice should come from a licensed Egyptian attorney registered with the Bar Association. For urgent matters, contact a lawyer or legal aid organization immediately.',
+            ar: 'المسائل القانونية المصرية يحكمها دستور 2014 وقوانين مختلفة: القانون المدني، والقانون الجنائي، والقانون التجاري، وقانون العمل، وقانون الأحوال الشخصية، وقوانين متخصصة. النظام القانوني يتبع مبادئ القانون المدني. بينما يمكنني تقديم معلومات عامة عن القانون المصري، يجب أن تأتي النصيحة القانونية المحددة من محامٍ مصري مرخص مسجل في نقابة المحامين. للمسائل العاجلة، اتصل بمحامٍ أو منظمة مساعدة قانونية فوراً.'
+        },
     };
 
     // Check for keywords and provide relevant responses
-    for (const [keyword, response] of Object.entries(responses)) {
+    for (const [keyword, responseObj] of Object.entries(responses)) {
         if (message.includes(keyword)) {
-            return response;
+            return responseObj[detectedLang] || responseObj.en;
         }
     }
 
-    // Default intelligent response
-    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-        return 'Hello! I\'m your AI Legal Assistant. I\'m here to help you understand legal concepts and answer questions about your rights. What legal question can I help you with today?';
+    // Default intelligent response - Egyptian Law Focus
+    if (message.includes('hello') || message.includes('hi') || message.includes('hey') || 
+        message.includes('مرحبا') || message.includes('السلام') || message.includes('أهلا')) {
+        if (detectedLang === 'ar') {
+            return 'مرحباً! أنا مساعدك القانوني الذكي المتخصص في القانون المصري. أنا هنا لمساعدتك في فهم الدستور المصري والقوانين المصرية والإجابة على أسئلتك حول حقوقك بموجب القانون المصري. ما هو السؤال القانوني المصري الذي يمكنني مساعدتك به اليوم؟';
+        } else {
+            return 'Hello! I\'m your AI Legal Assistant specialized in Egyptian law. I\'m here to help you understand the Egyptian Constitution and Egyptian laws, and answer questions about your rights under Egyptian law. What Egyptian legal question can I help you with today?';
+        }
     }
 
-    if (message.includes('thank')) {
-        return 'You\'re welcome! If you have any other legal questions, feel free to ask. Remember, for specific legal advice, it\'s always best to consult with a qualified attorney in your jurisdiction.';
+    if (message.includes('thank') || message.includes('شكر') || message.includes('مشكور')) {
+        if (detectedLang === 'ar') {
+            return 'عفواً! إذا كان لديك أي أسئلة أخرى حول القانون المصري أو الدستور المصري، لا تتردد في السؤال. تذكر، للحصول على نصيحة قانونية محددة، من الأفضل دائماً استشارة محامٍ مصري مؤهل مسجل في نقابة المحامين المصرية.';
+        } else {
+            return 'You\'re welcome! If you have any other questions about Egyptian law or the Egyptian Constitution, feel free to ask. Remember, for specific legal advice, it\'s always best to consult with a qualified Egyptian attorney registered with the Egyptian Bar Association.';
+        }
     }
 
-    if (message.includes('help')) {
-        return 'I can help you with questions about: tenant rights, contracts, filing complaints, understanding the legal system, your legal rights, and general legal concepts. What would you like to know?';
+    if (message.includes('help') || message.includes('مساعدة') || message.includes('مساعدة')) {
+        if (detectedLang === 'ar') {
+            return 'يمكنني مساعدتك في الأسئلة حول القانون المصري والدستور المصري، بما في ذلك: الدستور المصري 2014، والقانون المدني المصري، والقانون الجنائي المصري، وقانون الإيجار المصري، والعقود بموجب القانون المصري، وحقوق المستأجرين، وتقديم الشكاوى في المحاكم المصرية، والنظام القضائي المصري، وحقوقك الدستورية. ماذا تريد أن تعرف عن القانون المصري؟';
+        } else {
+            return 'I can help you with questions about Egyptian law and the Egyptian Constitution, including: Egyptian Constitution 2014, Egyptian Civil Code, Egyptian Criminal Code, Egyptian Rent Law, contracts under Egyptian law, tenant rights, filing complaints in Egyptian courts, Egyptian court system, and your constitutional rights. What would you like to know about Egyptian law?';
+        }
     }
 
-    // General response for unrecognized queries
-    return 'I understand you\'re asking about legal matters. While I can provide general information, I\'d recommend being more specific about your question. For example, you could ask about tenant rights, contracts, filing complaints, or understanding the difference between civil and criminal law. For specific legal advice tailored to your situation, please consult with a qualified attorney in your jurisdiction.';
+    // General response for unrecognized queries - Egyptian Law Focus
+    if (detectedLang === 'ar') {
+        return 'أفهم أنك تسأل عن مسائل قانونية مصرية. بينما يمكنني تقديم معلومات عامة عن القانون المصري والدستور المصري، أنصحك بأن تكون أكثر تحديداً في سؤالك. على سبيل المثال، يمكنك أن تسأل عن: الدستور المصري، أو القانون المدني المصري، أو قانون الإيجار المصري، أو العقود بموجب القانون المصري، أو كيفية تقديم دعوى في المحاكم المصرية. للحصول على نصيحة قانونية محددة لحالتك بموجب القانون المصري، يرجى استشارة محامٍ مصري مؤهل مسجل في نقابة المحامين المصرية.';
+    } else {
+        return 'I understand you\'re asking about Egyptian legal matters. While I can provide general information about Egyptian law and the Egyptian Constitution, I\'d recommend being more specific about your question. For example, you could ask about: the Egyptian Constitution, Egyptian Civil Code, Egyptian Rent Law, contracts under Egyptian law, or how to file a lawsuit in Egyptian courts. For specific legal advice tailored to your situation under Egyptian law, please consult with a qualified Egyptian attorney registered with the Egyptian Bar Association.';
+    }
 }
 
 // Error handling middleware (must be last, after all routes)
@@ -1228,7 +1476,23 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`🌐 Server URL: http://localhost:${PORT}`);
     console.log(`📡 Server is listening on all network interfaces`);
     console.log('='.repeat(50));
-    console.log('\n📝 Available endpoints:');
+    
+    // Check OpenAI API key status
+    const apiKey = process.env.OPENAI_API_KEY || '';
+    if (apiKey && apiKey.trim() !== '' && apiKey !== 'your-api-key-here') {
+        console.log('\n🤖 ChatGPT API: ✅ CONFIGURED');
+        console.log(`   Model: ${process.env.OPENAI_MODEL || 'gpt-3.5-turbo'}`);
+        console.log('   AI chat will use ChatGPT for responses\n');
+    } else {
+        console.log('\n⚠️  ChatGPT API: ❌ NOT CONFIGURED');
+        console.log('   Chat will use fallback rule-based responses');
+        console.log('   To enable ChatGPT:');
+        console.log('   Windows: set OPENAI_API_KEY=your-api-key-here');
+        console.log('   Linux/Mac: export OPENAI_API_KEY="your-api-key-here"');
+        console.log('   See CHATGPT_SETUP.md for details\n');
+    }
+    
+    console.log('📝 Available endpoints:');
     console.log(`   - Home: http://localhost:${PORT}/`);
     console.log(`   - Auth: http://localhost:${PORT}/auth.html`);
     console.log(`   - Dashboard: http://localhost:${PORT}/dashboard.html`);

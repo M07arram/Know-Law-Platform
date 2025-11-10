@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Know Law - Your Smart Legal Assistant</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Initialize theme before page renders to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-mode');
+                document.body.classList.add('light-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <header class="header">
@@ -124,29 +134,165 @@
             <span></span>
         </button>
         <nav class="nav-bar" id="navBar">
-            <a href="#" class="nav-link active">HOME</a>
-            <a href="#" class="nav-link">ABOUT</a>
-            <a href="#" class="nav-link">PRODUCTS</a>
-            <a href="#" class="nav-link">SOCIALS</a>
+            <a href="#home" class="nav-link active">HOME</a>
+            <a href="#about" class="nav-link">ABOUT</a>
+            <a href="#products" class="nav-link">PRODUCTS</a>
+            <a href="#socials" class="nav-link">SOCIALS</a>
         </nav>
         <button class="btn-header">DOWNLOAD App</button>
     </header>
 
     <main class="main-content">
-        <canvas id="background-canvas"></canvas>
-        <div class="content-wrapper">
-            <h1 class="headline">
-                <span>Know Law</span>
-            </h1>
-            <p class="subheadline">
-                Your Smart Legal Assistant Empowering People to Understand Their Rights Anytime, Anywhere
-            </p>
-            <div class="cta-buttons">
-                <button class="btn-primary">DOWNLOAD App</button>
-                <a href="auth.html" class="btn-secondary">GET STARTED</a>
+        <!-- Home/Hero Section -->
+        <section id="home" class="hero-section">
+            <canvas id="background-canvas"></canvas>
+            <div class="content-wrapper">
+                <h1 class="headline">
+                    <span>Know Law</span>
+                </h1>
+                <p class="subheadline">
+                    Your Smart Legal Assistant Empowering People to Understand Their Rights Anytime, Anywhere
+                </p>
+                <div class="cta-buttons">
+                    <button class="btn-primary">DOWNLOAD App</button>
+                    <a href="auth.html" class="btn-secondary">GET STARTED</a>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section">
+            <div class="section-container">
+                <h2 class="section-title">About Know Law</h2>
+                <div class="section-content">
+                    <div class="about-grid">
+                        <div class="about-card">
+                            <div class="about-icon">⚖️</div>
+                            <h3 class="about-card-title">Expert Legal Guidance</h3>
+                            <p class="about-card-text">
+                                Get instant access to comprehensive information about Egyptian law, including the Constitution, Civil Code, Criminal Code, and more. Our AI-powered assistant provides accurate, detailed explanations tailored to your questions.
+                            </p>
+                        </div>
+                        <div class="about-card">
+                            <div class="about-icon">🤖</div>
+                            <h3 class="about-card-title">AI-Powered Assistant</h3>
+                            <p class="about-card-text">
+                                Powered by advanced ChatGPT technology, our legal assistant understands both English and Arabic. Ask questions in your preferred language and receive detailed, context-aware responses about Egyptian legal matters.
+                            </p>
+                        </div>
+                        <div class="about-card">
+                            <div class="about-icon">📱</div>
+                            <h3 class="about-card-title">Accessible Anywhere</h3>
+                            <p class="about-card-text">
+                                Access legal information anytime, anywhere. Whether you need to understand your rights, learn about contracts, or get guidance on legal procedures, Know Law is always available to help.
+                            </p>
+                        </div>
+                        <div class="about-card">
+                            <div class="about-icon">🇪🇬</div>
+                            <h3 class="about-card-title">Egyptian Law Focus</h3>
+                            <p class="about-card-text">
+                                Specialized exclusively in Egyptian law and the Egyptian Constitution of 2014. Our assistant is trained to provide accurate information about the Egyptian legal system, court procedures, and your constitutional rights.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section">
+            <div class="section-container">
+                <h2 class="section-title">Our Products</h2>
+                <div class="section-content">
+                    <div class="products-grid">
+                        <div class="product-card">
+                            <div class="product-icon">💬</div>
+                            <h3 class="product-title">AI Legal Chat</h3>
+                            <p class="product-description">
+                                Chat with our AI legal assistant to get instant answers about Egyptian law. Ask questions in English or Arabic and receive comprehensive, detailed responses.
+                            </p>
+                            <a href="chat.html" class="product-link">Try Chat →</a>
+                        </div>
+                        <div class="product-card">
+                            <div class="product-icon">📅</div>
+                            <h3 class="product-title">Legal Consultation Booking</h3>
+                            <p class="product-description">
+                                Schedule appointments with qualified legal professionals. Book consultations for personalized legal advice tailored to your specific situation.
+                            </p>
+                            <a href="booking.html" class="product-link">Book Now →</a>
+                        </div>
+                        <div class="product-card">
+                            <div class="product-icon">📄</div>
+                            <h3 class="product-title">Document Analysis</h3>
+                            <p class="product-description">
+                                Upload legal documents and get general guidance about Egyptian legal documents. Our AI can help you understand the context and implications of your documents.
+                            </p>
+                            <a href="chat.html" class="product-link">Upload Document →</a>
+                        </div>
+                        <div class="product-card">
+                            <div class="product-icon">📚</div>
+                            <h3 class="product-title">Legal Knowledge Base</h3>
+                            <p class="product-description">
+                                Access comprehensive information about Egyptian Constitution, Civil Code, Criminal Code, Rent Law, Contract Law, and the Egyptian court system.
+                            </p>
+                            <a href="chat.html" class="product-link">Explore →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Socials Section -->
+        <section id="socials" class="section">
+            <div class="section-container">
+                <h2 class="section-title">Connect With Us</h2>
+                <div class="section-content">
+                    <p class="socials-intro">
+                        Stay connected with Know Law for the latest updates, legal insights, and community discussions.
+                    </p>
+                    <div class="socials-grid">
+                        <a href="#" class="social-card" target="_blank" rel="noopener noreferrer">
+                            <div class="social-icon">📘</div>
+                            <h3 class="social-title">Facebook</h3>
+                            <p class="social-description">Follow us on Facebook for legal tips and updates</p>
+                        </a>
+                        <a href="#" class="social-card" target="_blank" rel="noopener noreferrer">
+                            <div class="social-icon">🐦</div>
+                            <h3 class="social-title">Twitter</h3>
+                            <p class="social-description">Get quick legal insights on Twitter</p>
+                        </a>
+                        <a href="#" class="social-card" target="_blank" rel="noopener noreferrer">
+                            <div class="social-icon">💼</div>
+                            <h3 class="social-title">LinkedIn</h3>
+                            <p class="social-description">Connect with us professionally on LinkedIn</p>
+                        </a>
+                        <a href="#" class="social-card" target="_blank" rel="noopener noreferrer">
+                            <div class="social-icon">📷</div>
+                            <h3 class="social-title">Instagram</h3>
+                            <p class="social-description">Visual legal content on Instagram</p>
+                        </a>
+                        <a href="#" class="social-card" target="_blank" rel="noopener noreferrer">
+                            <div class="social-icon">📺</div>
+                            <h3 class="social-title">YouTube</h3>
+                            <p class="social-description">Watch legal tutorials and explanations</p>
+                        </a>
+                        <a href="#" class="social-card" target="_blank" rel="noopener noreferrer">
+                            <div class="social-icon">💬</div>
+                            <h3 class="social-title">WhatsApp</h3>
+                            <p class="social-description">Chat with us directly on WhatsApp</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">© 2024 Know Law. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>

@@ -17,6 +17,226 @@ body {
     background-color: #0a0e1a;
     color: white;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.light-mode {
+    background-color: #f5f7fa;
+}
+
+/* Light Mode Styles */
+body.light-mode {
+    background-color: #f5f7fa;
+    color: #1a1a1a;
+}
+
+body.light-mode .booking-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+}
+
+body.light-mode .booking-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .back-button {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+}
+
+body.light-mode .back-button:hover {
+    background: rgba(102, 178, 255, 0.1);
+    border-color: #66B2FF;
+}
+
+body.light-mode .logo-text {
+    color: #1a1a1a;
+}
+
+body.light-mode .header-text h1 {
+    background: linear-gradient(135deg, #66B2FF 0%, #1a1a1a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.light-mode .header-text p {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .booking-main {
+    background: #f5f7fa;
+}
+
+body.light-mode .lawyer-card {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .lawyer-card:hover {
+    border-color: #66B2FF;
+    box-shadow: 0 10px 30px rgba(102, 178, 255, 0.15);
+}
+
+body.light-mode .lawyer-name {
+    color: #1a1a1a;
+}
+
+body.light-mode .lawyer-specialty {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .booking-form {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .form-group label {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+body.light-mode .form-group input,
+body.light-mode .form-group textarea,
+body.light-mode .form-group select {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #1a1a1a;
+}
+
+body.light-mode .form-group input::placeholder,
+body.light-mode .form-group textarea::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.light-mode .form-group input:focus,
+body.light-mode .form-group textarea:focus,
+body.light-mode .form-group select:focus {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: #66B2FF;
+    box-shadow: 0 0 0 3px rgba(102, 178, 255, 0.1);
+}
+
+body.light-mode .submit-btn {
+    background: linear-gradient(135deg, #66B2FF 0%, #4a9eff 100%);
+}
+
+body.light-mode .search-box {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .search-box:focus-within {
+    border-color: #66B2FF;
+    box-shadow: 0 0 20px rgba(102, 178, 255, 0.2);
+}
+
+body.light-mode .search-box svg {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+body.light-mode .search-box input {
+    color: #1a1a1a;
+}
+
+body.light-mode .search-box input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.light-mode .lawyer-info h3 {
+    color: #1a1a1a;
+}
+
+body.light-mode .lawyer-info .lawyer-experience {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .category-filters {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .category-filter {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.8);
+}
+
+body.light-mode .category-filter:hover {
+    border-color: #66B2FF;
+    background: rgba(102, 178, 255, 0.1);
+    color: #1a1a1a;
+}
+
+body.light-mode .category-filter.active {
+    background: linear-gradient(135deg, #66B2FF 0%, #4a9eff 100%);
+    border-color: #66B2FF;
+    color: white;
+}
+
+body.light-mode .category-title {
+    color: #1a1a1a;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .lawyer-count {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .lawyer-description {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .lawyer-details {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .detail-item {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .rating-value {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+body.light-mode .booking-btn {
+    background: linear-gradient(135deg, #66B2FF 0%, #4a9eff 100%);
+}
+
+body.light-mode .modal-overlay {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .modal-close {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+}
+
+body.light-mode .modal-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .modal-content h2 {
+    color: #1a1a1a;
+}
+
+body.light-mode .success-modal {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .success-modal h2 {
+    color: #1a1a1a;
+}
+
+body.light-mode .success-modal p {
+    color: rgba(0, 0, 0, 0.7);
 }
 
 .booking-container {
@@ -35,6 +255,13 @@ body {
     z-index: 100;
 }
 
+.header-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
 .back-button {
     display: inline-flex;
     align-items: center;
@@ -47,7 +274,7 @@ body {
     color: white;
     text-decoration: none;
     transition: all 0.3s ease;
-    margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .back-button:hover {
@@ -61,6 +288,14 @@ body {
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
+    flex: 1;
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-left: auto;
 }
 
 .logo {
@@ -80,20 +315,20 @@ body {
     letter-spacing: 0.5px;
 }
 
-.header-content h1 {
+.header-text h1 {
     font-size: 32px;
     font-weight: 700;
     background: linear-gradient(135deg, #66B2FF 0%, #FFD700 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-left: auto;
+    margin: 0;
 }
 
-.header-content p {
+.header-text p {
     font-size: 16px;
     color: rgba(255, 255, 255, 0.7);
-    margin-left: auto;
+    margin: 0;
 }
 
 /* Main Content */
@@ -143,6 +378,74 @@ body {
 
 .search-box input::placeholder {
     color: rgba(255, 255, 255, 0.4);
+}
+
+/* Category Filters */
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(102, 178, 255, 0.2);
+}
+
+.category-filter {
+    padding: 10px 20px;
+    background: rgba(10, 14, 26, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(102, 178, 255, 0.2);
+    border-radius: 25px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.category-filter:hover {
+    border-color: #66B2FF;
+    background: rgba(102, 178, 255, 0.1);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.category-filter.active {
+    background: linear-gradient(135deg, #66B2FF 0%, #4a9eff 100%);
+    border-color: #66B2FF;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 178, 255, 0.3);
+}
+
+/* Category Sections */
+.category-section {
+    margin-bottom: 60px;
+    scroll-margin-top: 100px;
+}
+
+.category-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(102, 178, 255, 0.3);
+}
+
+.category-icon {
+    font-size: 32px;
+    display: inline-block;
+}
+
+.lawyer-count {
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    margin-left: auto;
 }
 
 /* Lawyers Grid */
@@ -489,15 +792,24 @@ body {
         padding: 15px 20px;
     }
 
-    .header-content h1 {
-        font-size: 24px;
-        margin-left: 0;
-        margin-top: 10px;
+    .header-wrapper {
+        gap: 15px;
     }
 
-    .header-content p {
+    .header-content {
+        gap: 15px;
+    }
+
+    .header-text {
         margin-left: 0;
-        margin-top: 5px;
+    }
+
+    .header-text h1 {
+        font-size: 24px;
+    }
+
+    .header-text p {
+        font-size: 14px;
     }
 
     .booking-main {
@@ -507,6 +819,35 @@ body {
     .lawyers-grid {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+
+    .category-filters {
+        gap: 8px;
+        margin-bottom: 30px;
+    }
+
+    .category-filter {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .category-title {
+        font-size: 22px;
+        flex-wrap: wrap;
+    }
+
+    .category-icon {
+        font-size: 24px;
+    }
+
+    .lawyer-count {
+        font-size: 16px;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .category-section {
+        margin-bottom: 40px;
     }
 
     .modal-content {
@@ -519,6 +860,7 @@ body {
 .hidden {
     display: none !important;
 }
+
 
 
 

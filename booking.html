@@ -5,73 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Book a Lawyer - Know Law</title>
     <link rel="stylesheet" href="booking.css">
+    <script>
+        // Initialize theme before page renders to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-mode');
+                document.body.classList.add('light-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="booking-container">
         <!-- Header -->
         <header class="booking-header">
-            <a href="dashboard.html" class="back-button">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
-            <div class="header-content">
-                <div class="logo">
-                    <svg width="50" height="60" viewBox="0 0 70 85" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="bookingGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-                                <stop offset="50%" style="stop-color:#D4AF37;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
-                            </linearGradient>
-                            <linearGradient id="bookingShieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" style="stop-color:#2a4a6c;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#1a3a5c;stop-opacity:1" />
-                            </linearGradient>
-                            <filter id="bookingGlow">
-                                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-                        </defs>
-                        <g id="booking-scale" filter="url(#bookingGlow)">
-                            <path d="M35 8 L35 20" stroke="#B8941F" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
-                            <path d="M35 8 L35 20" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                            <path d="M18 20 L52 20" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                            <ellipse cx="22" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
-                            <ellipse cx="22" cy="22.5" rx="10" ry="3" fill="url(#bookingGoldGradient)"/>
-                            <path d="M12 22.5 L22 22.5" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                            <ellipse cx="48" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
-                            <ellipse cx="48" cy="22.5" rx="10" ry="3" fill="url(#bookingGoldGradient)"/>
-                            <path d="M48 22.5 L58 22.5" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                            <text x="35" y="20" font-family="Arial, sans-serif" font-size="9" font-weight="900" fill="#FFD700" text-anchor="middle">AI</text>
-                        </g>
-                        <path id="booking-shield" d="M12 28 Q12 26 16 26 L54 26 Q58 26 58 28 L58 50 Q58 58 48 63 Q35 65 35 65 Q35 65 22 63 Q12 58 12 50 Z" 
-                              fill="url(#bookingShieldGradient)" stroke="#0f2a42" stroke-width="1.5"/>
-                        <g id="booking-circuits" opacity="0.8">
-                            <circle cx="22" cy="35" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="48" cy="35" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="26" cy="40" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="44" cy="40" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="30" cy="45" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="40" cy="45" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="28" cy="50" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="42" cy="50" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <circle cx="35" cy="52" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
-                            <path d="M22 35 L26 40 M48 35 L44 40 M26 40 L30 45 M44 40 L40 45 M30 45 L28 50 M40 45 L42 50 M28 50 L35 52 M42 50 L35 52" 
-                                  stroke="#66B2FF" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
-                        </g>
-                        <g id="booking-brain" filter="url(#bookingGlow)">
-                            <path d="M26 35 Q24 33 25 31 Q26 29 28 30 Q29 31 35 31 Q37 31 38 30 Q40 29 41 31 Q42 33 40 35 Q39 37 37 38 Q35 39 35 40 Q35 41 33 41 Q31 41 30 40 Q30 39 30 38 Q28 37 26 35 Z" 
-                                  fill="url(#bookingGoldGradient)"/>
-                        </g>
+            <div class="header-wrapper">
+                <a href="dashboard.html" class="back-button">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span class="logo-text">Know Law</span>
+                </a>
+                <div class="header-content">
+                    <div class="logo">
+                        <svg width="50" height="60" viewBox="0 0 70 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="bookingGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#D4AF37;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="bookingShieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#2a4a6c;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#1a3a5c;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="bookingGlow">
+                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <g id="booking-scale" filter="url(#bookingGlow)">
+                                <path d="M35 8 L35 20" stroke="#B8941F" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+                                <path d="M35 8 L35 20" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                <path d="M18 20 L52 20" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                <ellipse cx="22" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                                <ellipse cx="22" cy="22.5" rx="10" ry="3" fill="url(#bookingGoldGradient)"/>
+                                <path d="M12 22.5 L22 22.5" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                <ellipse cx="48" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                                <ellipse cx="48" cy="22.5" rx="10" ry="3" fill="url(#bookingGoldGradient)"/>
+                                <path d="M48 22.5 L58 22.5" stroke="url(#bookingGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                <text x="35" y="20" font-family="Arial, sans-serif" font-size="9" font-weight="900" fill="#FFD700" text-anchor="middle">AI</text>
+                            </g>
+                            <path id="booking-shield" d="M12 28 Q12 26 16 26 L54 26 Q58 26 58 28 L58 50 Q58 58 48 63 Q35 65 35 65 Q35 65 22 63 Q12 58 12 50 Z" 
+                                  fill="url(#bookingShieldGradient)" stroke="#0f2a42" stroke-width="1.5"/>
+                            <g id="booking-circuits" opacity="0.8">
+                                <circle cx="22" cy="35" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="48" cy="35" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="26" cy="40" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="44" cy="40" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="30" cy="45" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="40" cy="45" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="28" cy="50" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="42" cy="50" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <circle cx="35" cy="52" r="2" fill="#66B2FF" filter="url(#bookingGlow)"/>
+                                <path d="M22 35 L26 40 M48 35 L44 40 M26 40 L30 45 M44 40 L40 45 M30 45 L28 50 M40 45 L42 50 M28 50 L35 52 M42 50 L35 52" 
+                                      stroke="#66B2FF" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+                            </g>
+                            <g id="booking-brain" filter="url(#bookingGlow)">
+                                <path d="M26 35 Q24 33 25 31 Q26 29 28 30 Q29 31 35 31 Q37 31 38 30 Q40 29 41 31 Q42 33 40 35 Q39 37 37 38 Q35 39 35 40 Q35 41 33 41 Q31 41 30 40 Q30 39 30 38 Q28 37 26 35 Z" 
+                                      fill="url(#bookingGoldGradient)"/>
+                            </g>
+                        </svg>
+                        <span class="logo-text">Know Law</span>
+                    </div>
+                    <div class="header-text">
+                        <h1>Book a Lawyer</h1>
+                        <p>Find and book the right legal expert for your needs</p>
+                    </div>
                 </div>
-                <h1>Book a Lawyer</h1>
-                <p>Find and book the right legal expert for your needs</p>
             </div>
         </header>
 
@@ -87,8 +101,26 @@
                 </div>
             </div>
 
-            <div class="lawyers-grid" id="lawyersGrid">
-                <!-- Lawyer cards will be generated by JavaScript -->
+            <!-- Category Filter Buttons -->
+            <div class="category-filters">
+                <button class="category-filter active" data-category="all">All Lawyers</button>
+                <button class="category-filter" data-category="Criminal Law">Criminal Law</button>
+                <button class="category-filter" data-category="Family Law">Family Law</button>
+                <button class="category-filter" data-category="Corporate Law">Corporate Law</button>
+                <button class="category-filter" data-category="Personal Injury">Personal Injury</button>
+                <button class="category-filter" data-category="Real Estate Law">Real Estate</button>
+                <button class="category-filter" data-category="Immigration Law">Immigration</button>
+                <button class="category-filter" data-category="Employment Law">Employment</button>
+                <button class="category-filter" data-category="Intellectual Property">IP Law</button>
+                <button class="category-filter" data-category="Estate Planning">Estate Planning</button>
+                <button class="category-filter" data-category="Tax Law">Tax Law</button>
+                <button class="category-filter" data-category="Bankruptcy Law">Bankruptcy</button>
+                <button class="category-filter" data-category="Environmental Law">Environmental</button>
+            </div>
+
+            <!-- Category Sections -->
+            <div id="lawyersContainer">
+                <!-- Category sections will be generated by JavaScript -->
             </div>
         </main>
 
@@ -163,6 +195,7 @@
     <script src="booking.js"></script>
 </body>
 </html>
+
 
 
 

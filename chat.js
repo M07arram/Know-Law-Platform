@@ -16,8 +16,28 @@ let currentConversationId = null;
 let conversations = [];
 let messageIdCounter = 0; // For tracking message IDs in the UI
 
+// Theme Management
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-mode');
+        document.body.classList.add('light-mode');
+    } else {
+        document.documentElement.classList.remove('light-mode');
+        document.body.classList.remove('light-mode');
+    }
+}
+
+// Listen for theme changes from other pages
+window.addEventListener('storage', (e) => {
+    if (e.key === 'theme') {
+        initTheme();
+    }
+});
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
+    initTheme();
     await loadChatHistory();
     await checkAuth();
 });

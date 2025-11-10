@@ -18,9 +18,9 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "multer": "^1.4.5-lts.1",
+    "openai": "^4.104.0",
     "sqlite3": "^5.1.6"
   },
-  "devDependencies": {},
   "keywords": [
     "legal",
     "assistant",

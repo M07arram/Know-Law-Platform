@@ -5,67 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>AI Legal Assistant Chat - Know Law</title>
     <link rel="stylesheet" href="chat.css">
+    <script>
+        // Initialize theme before page renders to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-mode');
+                document.body.classList.add('light-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="chat-container">
         <!-- Sidebar -->
         <aside class="chat-sidebar">
             <div class="sidebar-header">
-                <a href="dashboard.html" class="back-button">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </a>
-                <div class="logo-section">
-                    <div class="logo">
-                        <svg width="40" height="48" viewBox="0 0 70 85" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <linearGradient id="chatGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-                                    <stop offset="50%" style="stop-color:#D4AF37;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
-                                </linearGradient>
-                                <linearGradient id="chatShieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#2a4a6c;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#1a3a5c;stop-opacity:1" />
-                                </linearGradient>
-                                <filter id="chatGlow">
-                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                                    <feMerge>
-                                        <feMergeNode in="coloredBlur"/>
-                                        <feMergeNode in="SourceGraphic"/>
-                                    </feMerge>
-                                </filter>
-                            </defs>
-                            <g id="chat-scale" filter="url(#chatGlow)">
-                                <path d="M35 8 L35 20" stroke="#B8941F" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
-                                <path d="M35 8 L35 20" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                                <path d="M18 20 L52 20" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                                <ellipse cx="22" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
-                                <ellipse cx="22" cy="22.5" rx="10" ry="3" fill="url(#chatGoldGradient)"/>
-                                <path d="M12 22.5 L22 22.5" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                                <ellipse cx="48" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
-                                <ellipse cx="48" cy="22.5" rx="10" ry="3" fill="url(#chatGoldGradient)"/>
-                                <path d="M48 22.5 L58 22.5" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                                <text x="35" y="20" font-family="Arial, sans-serif" font-size="9" font-weight="900" fill="#FFD700" text-anchor="middle">AI</text>
-                            </g>
-                            <path id="chat-shield" d="M12 28 Q12 26 16 26 L54 26 Q58 26 58 28 L58 50 Q58 58 48 63 Q35 65 35 65 Q35 65 22 63 Q12 58 12 50 Z" 
-                                  fill="url(#chatShieldGradient)" stroke="#0f2a42" stroke-width="1.5"/>
-                            <g id="chat-circuits" opacity="0.8">
-                                <circle cx="22" cy="35" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
-                                <circle cx="48" cy="35" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
-                                <circle cx="26" cy="40" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
-                                <circle cx="44" cy="40" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
-                                <circle cx="30" cy="45" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
-                                <circle cx="40" cy="45" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
-                                <path d="M22 35 L26 40 M48 35 L44 40 M26 40 L30 45 M44 40 L40 45" stroke="#66B2FF" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
-                            </g>
-                            <g id="chat-brain" filter="url(#chatGlow)">
-                                <path d="M26 35 Q24 33 25 31 Q26 29 28 30 Q29 31 35 31 Q37 31 38 30 Q40 29 41 31 Q42 33 40 35 Q39 37 37 38 Q35 39 35 40 Q35 41 33 41 Q31 41 30 40 Q30 39 30 38 Q28 37 26 35 Z" fill="url(#chatGoldGradient)"/>
-                            </g>
+                <div class="header-wrapper">
+                    <a href="dashboard.html" class="back-button">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
+                    </a>
+                    <div class="logo-section">
+                        <div class="logo">
+                            <svg width="40" height="48" viewBox="0 0 70 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="chatGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#D4AF37;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
+                                    </linearGradient>
+                                    <linearGradient id="chatShieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#2a4a6c;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#1a3a5c;stop-opacity:1" />
+                                    </linearGradient>
+                                    <filter id="chatGlow">
+                                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <g id="chat-scale" filter="url(#chatGlow)">
+                                    <path d="M35 8 L35 20" stroke="#B8941F" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+                                    <path d="M35 8 L35 20" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                    <path d="M18 20 L52 20" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                    <ellipse cx="22" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                                    <ellipse cx="22" cy="22.5" rx="10" ry="3" fill="url(#chatGoldGradient)"/>
+                                    <path d="M12 22.5 L22 22.5" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                    <ellipse cx="48" cy="23" rx="10" ry="3" fill="#B8941F" opacity="0.3"/>
+                                    <ellipse cx="48" cy="22.5" rx="10" ry="3" fill="url(#chatGoldGradient)"/>
+                                    <path d="M48 22.5 L58 22.5" stroke="url(#chatGoldGradient)" stroke-width="2.5" stroke-linecap="round"/>
+                                    <text x="35" y="20" font-family="Arial, sans-serif" font-size="9" font-weight="900" fill="#FFD700" text-anchor="middle">AI</text>
+                                </g>
+                                <path id="chat-shield" d="M12 28 Q12 26 16 26 L54 26 Q58 26 58 28 L58 50 Q58 58 48 63 Q35 65 35 65 Q35 65 22 63 Q12 58 12 50 Z" 
+                                      fill="url(#chatShieldGradient)" stroke="#0f2a42" stroke-width="1.5"/>
+                                <g id="chat-circuits" opacity="0.8">
+                                    <circle cx="22" cy="35" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
+                                    <circle cx="48" cy="35" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
+                                    <circle cx="26" cy="40" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
+                                    <circle cx="44" cy="40" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
+                                    <circle cx="30" cy="45" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
+                                    <circle cx="40" cy="45" r="2" fill="#66B2FF" filter="url(#chatGlow)"/>
+                                    <path d="M22 35 L26 40 M48 35 L44 40 M26 40 L30 45 M44 40 L40 45" stroke="#66B2FF" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+                                </g>
+                                <g id="chat-brain" filter="url(#chatGlow)">
+                                    <path d="M26 35 Q24 33 25 31 Q26 29 28 30 Q29 31 35 31 Q37 31 38 30 Q40 29 41 31 Q42 33 40 35 Q39 37 37 38 Q35 39 35 40 Q35 41 33 41 Q31 41 30 40 Q30 39 30 38 Q28 37 26 35 Z" fill="url(#chatGoldGradient)"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h2>AI Legal Assistant</h2>
                     </div>
-                    <h2>AI Legal Assistant</h2>
                 </div>
             </div>
             <div class="sidebar-content">
